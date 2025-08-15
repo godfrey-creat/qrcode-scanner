@@ -129,7 +129,12 @@ def generate_qr(server_url):
     print(f"QR Code generated and saved as 'my-qrcode.png'. Link: {server_url}")
 
 if __name__ == "__main__":
-    # Set your server address here for QR generation
-    server_url = "http://127.0.0.1:5000"
+    # Get the port from environment variables or default to 5000
+    port = int(os.environ.get("PORT", 5000))
+    
+    # Set server address for QR generation (replace with your Render URL after deployment)
+    server_url = f"http://0.0.0.0:{port}"
     generate_qr(server_url)
-    app.run(debug=True)
+    
+    # Run app for deployment
+    app.run(host="0.0.0.0", port=port, debug=False)
