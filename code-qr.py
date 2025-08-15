@@ -130,6 +130,6 @@ def generate_qr(server_url):
 
 if __name__ == "__main__":
     # Set your server address here for QR generation
-    server_url = "http://127.0.0.1:5000"
+    server_url = "https://qrcode-scanner-8d9g.onrender.com"
     generate_qr(server_url)
     app.run(debug=True)
