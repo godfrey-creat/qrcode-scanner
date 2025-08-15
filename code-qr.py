@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, render_template_string
+from flask import Flask, request, redirect, render_template_string, send_file, abort
 import csv
 import qrcode
 import os
@@ -7,6 +7,9 @@ app = Flask(__name__)
 
 # Path to store CSV data
 CSV_FILE = "submissions.csv"
+
+# Simple password for CSV download (change this!)
+DOWNLOAD_PASSWORD = os.environ.get("CSV_DOWNLOAD_PASSWORD", "Buddy123")
 
 # HTML form template with mobile responsiveness
 FORM_HTML = """
@@ -123,6 +126,16 @@ def form():
     
     return render_template_string(FORM_HTML)
 
+@app.route("/download-submissions")
+def download_csv():
+    password = request.args.get("password")
+    if password != DOWNLOAD_PASSWORD:
+        return abort(403, description="Forbidden: Incorrect password")
+    
+    if os.path.exists(CSV_FILE):
+        return send_file(CSV_FILE, as_attachment=True)
+    return "No submissions yet."
+
 def generate_qr(server_url):
     img = qrcode.make(server_url)
     img.save("my-qrcode.png")
@@ -133,8 +146,9 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     
     # Set server address for QR generation (replace with your Render URL after deployment)
-    server_url = f"http://0.0.0.0:{port}"
+    server_url = f"https://qrcode-scanner-8d9g.onrender.com"
     generate_qr(server_url)
     
     # Run app for deployment
     app.run(host="0.0.0.0", port=port, debug=False)
+
